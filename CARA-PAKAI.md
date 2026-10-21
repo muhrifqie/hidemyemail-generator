@@ -55,7 +55,21 @@ Semua kode ada di `src/hidemyemail_generator/` (editable install, jadi edit lang
 
 Push perubahan: `git push origin main`. Narik update upstream: `git fetch upstream && git merge upstream/main`.
 
+## Jalan di VPS (cron auto-generate + IMAP)
+
+Sudah ter-deploy di **shopeeboosthelper** (`/srv/hidemyemail`, python3.12 venv, tanpa uv).
+Cron generate 3 alias/hari jam 02:00 WIB. Detail ops: [`vps/OPS.md`](vps/OPS.md).
+
+2 hal yang **wajib kamu isi** sebelum beneran jalan:
+1. **IMAP** (sekali): bikin app-specific password di appleid.apple.com, lalu
+   `ssh shopeeboosthelper 'cd /srv/hidemyemail && .venv/bin/hidemyemail inbox setup --host imap.mail.me.com --username <appleid> --password <app-pw>'`
+2. **Cookie**: capture di lokal (`jalan.cmd` → menu 4), lalu double-click `push-cookie.cmd`.
+
+Server kita (host sama) baca hasil dari SQLite `hidemyemail.db` atau
+`.venv/bin/hidemyemail inbox codes --result-json ...`.
+
 ## Catatan
 
-- Jangan commit `cookies.txt`, `emails.txt`, `hidemyemail.db` (sudah di-ignore).
+- Jangan commit `cookies.txt`, `emails.txt`, `hidemyemail.db`, `inbox_config.json` (sudah di-ignore).
 - Otomasi akun iCloud sendiri. Login & generate dilakukan kamu, bukan agent.
+- Cookie web iCloud expire berkala → refresh lokal + `push-cookie.cmd`. Awas kuota Apple (~750 alias).
