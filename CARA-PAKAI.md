@@ -68,6 +68,25 @@ Cron generate 3 alias/hari jam 02:00 WIB. Detail ops: [`vps/OPS.md`](vps/OPS.md)
 Server kita (host sama) baca hasil dari SQLite `hidemyemail.db` atau
 `.venv/bin/hidemyemail inbox codes --result-json ...`.
 
+### Auto-refresh cookie (pyicloud) — biar nggak capture manual
+
+Cookie web iCloud expire ~mingguan. Daripada capture manual, pakai auto-refresh lewat
+**pyicloud**: login sekali, re-auth berikutnya **tanpa 2FA** pakai trust token. Jalanin di
+**laptop** (IP rumah — login iCloud dari IP VPS rawan dicurigai Apple).
+
+1. **Login sekali**: double-click `refresh-login.cmd` → Apple ID + password + kode 2FA.
+   Password masuk **Windows Credential Manager** (keyring, bukan plaintext), device di-*trust*,
+   `cookies.txt` keisi + auto-push ke VPS.
+2. **Refresh berikutnya** (tanpa 2FA): `refresh-cookie.cmd` → re-auth pakai trust token, tulis
+   ulang `cookies.txt` + push. Kalau trust expired, dia nyuruh jalanin `refresh-login.cmd` lagi.
+3. **Otomatis berkala** (opsional, Task Scheduler):
+   ```
+   schtasks /create /tn "HME cookie refresh" /tr "C:\BOT\HideMyEmail\refresh-cookie.cmd" /sc DAILY /st 09:00
+   ```
+
+Jangan commit (udah di-ignore): `auth/.pyicloud-session/`, `auth/refresh_config.json`, `cookies.txt`.
+Kode: [`auth/refresh_cookies.py`](auth/refresh_cookies.py). Dep: `uv sync --extra auth`.
+
 ## Catatan
 
 - Jangan commit `cookies.txt`, `emails.txt`, `hidemyemail.db`, `inbox_config.json` (sudah di-ignore).

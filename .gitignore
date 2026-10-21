@@ -26,3 +26,11 @@ android/build/
 android/*.apk
 android/*.aab
 android/*.png
+
+# HAR captures (berisi cookie/token) — jangan commit
+*.har
+*.HAR
+
+# pyicloud auto-refresh (sesi + config lokal, jangan commit)
+.pyicloud-session/
+auth/refresh_config.json
