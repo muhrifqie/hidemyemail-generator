@@ -11,11 +11,14 @@ ssh shopeeboosthelper 'cd /srv/hidemyemail && bash vps/deploy.sh'
 ```
 Rollback: lihat baris terakhir output deploy (`git reset --hard <PREV>`).
 
-## Cron auto-generate
-Entry (lihat `crontab -l`): tiap hari 02:00 WIB jalanin `vps/run-generate.sh`.
-- Aman kalau cookie absen → SKIP, log di `logs/cron.log`.
-- Ubah frekuensi/jumlah: `crontab -e`, arg = jumlah alias per run.
-- Matikan: `crontab -e` lalu comment barisnya.
+## Cron auto-generate (top-up ke CAP)
+Entry (lihat `crontab -l`): tiap 30 menit `vps/run-generate.sh` → top-up alias sampai
+`HME_CAP` (default 700), maks `HME_BATCH` (default 5) per run (batas window Apple ~5/30menit).
+- Pas kena rate-limit Apple (-41015) → di-log, run berikutnya nyoba lagi (auto-backoff).
+- Cap tercapai → stop generate.
+- Cookie absen/expired → SKIP, log di `logs/cron.log`.
+- Ubah cap: edit crontab, set `HME_CAP=NNN`. Matikan: comment barisnya.
+- ⚠️ Generate agresif = risiko Apple lock akun / HME disabled. Pantau `logs/cron.log` + `whoami`.
 
 ## Server kita manggil (same host)
 Data di SQLite `hidemyemail.db`. Opsi:
