@@ -68,6 +68,18 @@ Cron generate 3 alias/hari jam 02:00 WIB. Detail ops: [`vps/OPS.md`](vps/OPS.md)
 Server kita (host sama) baca hasil dari SQLite `hidemyemail.db` atau
 `.venv/bin/hidemyemail inbox codes --result-json ...`.
 
+### Auto-generate di PC ini (AKTIF) — tiap 31 menit → Telegram
+
+Setup aktif sekarang: Windows Task Scheduler **"HME gas 31m"** jalanin
+[`auth/gen_notify.py`](auth/gen_notify.py) tiap 31 menit → generate 5 alias di PC ini,
+kirim yang berhasil ke Telegram owner. Cron VPS **dimatikan** (biar nggak dobel).
+
+- Manual sekali: double-click `gas-local.cmd`.
+- Lihat/ubah jadwal: Task Scheduler → "HME gas 31m". Hapus:
+  `Unregister-ScheduledTask -TaskName "HME gas 31m"` (PowerShell).
+- Butuh: `cookies.txt` valid (refresh via bawah) + `node` (buat tg.mjs Markas).
+- 31 menit sengaja (lewat 1 menit dari window 30-menit Apple). Rate-limit → skip diam.
+
 ### Auto-refresh cookie (pyicloud) — biar nggak capture manual
 
 Cookie web iCloud expire ~mingguan. Daripada capture manual, pakai auto-refresh lewat
