@@ -47,7 +47,6 @@ else
   fi
 fi
 
-# Tarik email forward + kode verifikasi kalau IMAP sudah dikonfigur.
-if [ -s inbox_config.json ]; then
-  "$HME" inbox sync >> logs/cron.log 2>&1 && log "inbox sync OK" || log "inbox sync gagal"
-fi
+# ponytail: inbox sync dipisah ke cron sendiri (tiap 30 menit), biar wrapper ini
+# bisa di-poll sering (tiap ~10 menit) buat nangkep window Apple reset tanpa
+# nge-hammer IMAP tiap kali.

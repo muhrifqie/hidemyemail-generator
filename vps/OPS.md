@@ -11,13 +11,16 @@ ssh shopeeboosthelper 'cd /srv/hidemyemail && bash vps/deploy.sh'
 ```
 Rollback: lihat baris terakhir output deploy (`git reset --hard <PREV>`).
 
-## Cron auto-generate (top-up ke CAP)
-Entry (lihat `crontab -l`): tiap 30 menit `vps/run-generate.sh` → top-up alias sampai
-`HME_CAP` (default 700), maks `HME_BATCH` (default 5) per run (batas window Apple ~5/30menit).
-- Pas kena rate-limit Apple (-41015) → di-log, run berikutnya nyoba lagi (auto-backoff).
-- Cap tercapai → stop generate.
-- Cookie absen/expired → SKIP, log di `logs/cron.log`.
-- Ubah cap: edit crontab, set `HME_CAP=NNN`. Matikan: comment barisnya.
+## Cron auto-generate (polling + top-up ke CAP)
+Dua entry (lihat `crontab -l`):
+- `*/10 * * * * HME_CAP=700 run-generate.sh` → POLL tiap 10 menit: top-up alias sampai
+  `HME_CAP` (default 700), maks `HME_BATCH` (default 5) per run. Begitu window Apple reset,
+  langsung ke-grab (nggak nunggu lama). Pas rate-limit (-41015) → di-log, poll berikutnya nyoba lagi.
+- `*/30 * * * * hidemyemail inbox sync` → tarik email forward + kode verifikasi tiap 30 menit.
+Catatan:
+- Poll nggak nambah kecepatan (Apple tetap cap ~5/30menit), cuma mangkas delay.
+- Cap tercapai → stop. Cookie absen/expired → SKIP, log `logs/cron.log`.
+- Ubah cap: edit crontab `HME_CAP=NNN`. Lebih kalem: ganti `*/10` jadi `*/30`.
 - ⚠️ Generate agresif = risiko Apple lock akun / HME disabled. Pantau `logs/cron.log` + `whoami`.
 
 ## Server kita manggil (same host)
